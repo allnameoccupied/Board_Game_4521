@@ -7,13 +7,19 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.app.boardgame4521.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
@@ -37,12 +43,14 @@ public final class util {
     //LIFECYCLE
     private static boolean isInited = false;
 
-    public static void INIT() {
+    public static void INIT(Context context) {
         if (isInited) {
             return;
         } else {
+            setAppContext(context);
+
             init_Notification();
-//            init_Vibrator();
+            init_Vibrator();
 //            init_Camera();
 //            init_WorkManager();
 //            init_LocalBroadcastReceiver();
@@ -51,11 +59,25 @@ public final class util {
 //            init_Firebase();
 //            init_Firestore();
 //            init_Service();
-//            init_Network();
+            init_Network();
 
 //            init_Sensor();
+
+            utilGoogle.INIT();
+            utilRealm.INIT();
+
             isInited = true;
         }
+    }
+
+    public static void PAUSE() {
+        stopToast();
+//        stopSnackbar();
+        stopVibrator();
+    }
+
+    public static void DESTROY() {
+        utilRealm.shutdownRealm();
     }
 
     //TOAST
@@ -189,5 +211,61 @@ public final class util {
 
     public static void makeNotification(int ID, Notification notification) {
         notiManager.notify(ID, notification);
+    }
+
+    //VIBRATOR  (max amplitude = 255)
+    private static Vibrator vibrator;
+
+    private static void init_Vibrator() {
+        vibrator = (Vibrator) APP_CONTEXT.getSystemService(Context.VIBRATOR_SERVICE);
+    }
+
+    public static void makeVibrate_full(long ms, int amplitude) {
+        stopVibrator();
+        vibrator.vibrate(VibrationEffect.createOneShot(ms, amplitude));
+    }
+
+    public static void makeVibrate(long ms) {
+        makeVibrate_full(ms, VibrationEffect.DEFAULT_AMPLITUDE);
+    }
+
+    public static void makeVibrate_pattern(long[] ms, int[] amplitude, int repeat) {
+        if (ms.length != amplitude.length) {
+            return;
+        }
+        stopVibrator();
+        vibrator.vibrate(VibrationEffect.createWaveform(ms, amplitude, repeat));
+    }
+
+    public static void makeVibrate_pattern(long[] ms, int[] amplitude) {
+        makeVibrate_pattern(ms, amplitude, -1);
+    }
+
+    public static void makeVibrate_pattern(long[] ms, int repeat) {
+        stopVibrator();
+        vibrator.vibrate(VibrationEffect.createWaveform(ms, repeat));
+    }
+
+    public static void makeVibrate_pattern(long[] ms) {
+        makeVibrate_pattern(ms, -1);
+    }
+
+    public static void stopVibrator() {
+        vibrator.cancel();
+    }
+
+    //NETWORK   //check only
+    private static ConnectivityManager networkManager;
+
+    private static void init_Network(){
+        networkManager = ((ConnectivityManager) APP_CONTEXT.getSystemService(Context.CONNECTIVITY_SERVICE));
+    }
+
+    public static boolean network_isNetworkConnected(){
+        return networkManager.getActiveNetworkInfo() != null;
+    }
+
+    public static ArrayList<Network> network_getAllNetworks(){
+        return new ArrayList<>(Arrays.asList(networkManager.getAllNetworks()));
     }
 }

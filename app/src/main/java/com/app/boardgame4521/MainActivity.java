@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.app.boardgame4521.MaxUtil.util;
+import com.app.boardgame4521.MaxUtil.utilGoogle;
+import com.app.boardgame4521.MaxUtil.utilRealm;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //maxutil
-        util.setAppContext(getApplicationContext());
-        util.INIT();
+        util.INIT(getApplicationContext());
     }
 }
