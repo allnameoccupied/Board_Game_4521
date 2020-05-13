@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -21,6 +22,7 @@ import com.app.boardgame4521.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -265,7 +267,12 @@ public final class util {
         return networkManager.getActiveNetworkInfo() != null;
     }
 
-    public static ArrayList<Network> network_getAllNetworks(){
-        return new ArrayList<>(Arrays.asList(networkManager.getAllNetworks()));
+    public static ArrayList<NetworkInfo> network_getAllNetworksInfo(){
+        return new ArrayList<>(Arrays.asList(networkManager.getAllNetworks()))
+                .stream()
+                .map(network -> networkManager.getNetworkInfo(network))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    public static NetworkInfo network_getActiveNetworkInfo(){return networkManager.getActiveNetworkInfo();}
 }

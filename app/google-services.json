@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "948258710445",
+    "firebase_url": "https://comp45212020sgp2-1589382074854.firebaseio.com",
+    "project_id": "comp45212020sgp2-1589382074854",
+    "storage_bucket": "comp45212020sgp2-1589382074854.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948258710445:android:d8621dfedaf31b51eb7724",
+        "android_client_info": {
+          "package_name": "com.app.boardgame4521"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948258710445-e1vhjhb49f53i7bld6dgu38doosf4b21.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.boardgame4521",
+            "certificate_hash": "e6342e9de1d28f442fc893ea1d54d1c72565de62"
+          }
+        },
+        {
+          "client_id": "948258710445-svdqdoh753c17bndiu1aacdfd6shvtjo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGNgvW7vatmNuvnKRqHEUYqvy0y69FtBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "948258710445-svdqdoh753c17bndiu1aacdfd6shvtjo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
