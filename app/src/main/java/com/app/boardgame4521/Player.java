@@ -28,16 +28,6 @@ public class Player {
     public Position getPosition() { return position; }
     public List<Card> getCards() { return cards; }
 
-    public boolean playCard(Card card){
-
-        return true;
-    }
-
-    public boolean bid(){
-
-        return true;
-    }
-
     public void addScore(int winning) {
         this.score += winning;
     }

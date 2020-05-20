@@ -40,7 +40,6 @@ public class Game {
     // Note:
     // startGame is a complete game run for a total of 13 round
     // Need to take care user input for trump, target, cards and bid
-
     public void startGame() {
 
         while (round < 14) {

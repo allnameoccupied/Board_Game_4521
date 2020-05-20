@@ -3,5 +3,5 @@
     <string name="trump">Trump:</string>
     <string name="round">Round:</string>
     <string name="target">Target:</string>
-    <string name="win_trick">Win Trick: 0</string>
+    <string name="win_trick">Stack: 0</string>
 </resources>
