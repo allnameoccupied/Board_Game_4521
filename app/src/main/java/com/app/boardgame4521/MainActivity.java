@@ -50,5 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void maxTestButtonHandler4(View view){
+        Intent intent = new Intent(MainActivity.this, GameActivity.class);
+        startActivity(intent);
     }
 }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PokerHub</string>
+    <string name="trump">Trump:</string>
+    <string name="round">Round:</string>
 </resources>
