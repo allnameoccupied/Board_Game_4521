@@ -6,6 +6,11 @@ public class Card {
     private char rank;
     private Suit suit;
 
+    public Card(char rank, Suit suit){
+        this.rank = rank;
+        this.suit = suit;
+    }
+
     public char getRank() { return rank; }
     public Suit getSuit() { return suit; }
 }
