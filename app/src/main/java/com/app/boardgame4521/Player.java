@@ -10,10 +10,9 @@ public class Player {
     private Position position;
     private List<Card> cards;
 
-    protected Player(String name, Position position, List<Card> cards){
+    protected Player(String name, Position position){
         this.name = name;
         this.position = position;
-        this.cards = cards;
     }
     public String getName() { return name; }
     public int getScore() { return score; }
@@ -29,6 +28,10 @@ public class Player {
     public boolean bid(){
 
         return true;
+    }
+
+    public void addCard(Card card){
+        cards.add(card);
     }
 }
 
