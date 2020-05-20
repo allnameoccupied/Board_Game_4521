@@ -16,18 +16,10 @@ public class Game {
 
     public Game() {
         for (Suit s : Suit.values()) {
-            Card cardA = new Card('A', s);
-            cardPile.add(cardA);
-            for (int i = 2; i < 11; ++i) { //2-10
-                Card card = new Card((char) i, s);
+            for (int i = 2; i < 15; ++i) { // 2-10, J, Q, K, A
+                Card card = new Card(i, s);
                 cardPile.add(card);
             }
-            Card cardJ = new Card('J', s);
-            Card cardQ = new Card('Q', s);
-            Card cardK = new Card('K', s);
-            cardPile.add(cardJ);
-            cardPile.add(cardQ);
-            cardPile.add(cardK);
         }
         Player player1 = new Player("A", Position.E);
         Player player2 = new Player("B", Position.S);
