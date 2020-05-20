@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Game {
-    private List<Player> players;
+    private List<Player> players = new ArrayList<>();
     private Suit trump;
     private final List<Card> cardPile = new ArrayList<>();
     private int round = 1;
@@ -30,6 +30,13 @@ public class Game {
         players.add(player4);
     }
 
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public int getRound() {
+        return round;
+    }
     // Note:
     // startGame is a complete game run for a total of 13 round
     // Need to take care user input for trump, target, cards and bid
