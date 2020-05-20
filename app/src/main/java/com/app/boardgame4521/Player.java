@@ -50,6 +50,7 @@ public class Player {
         this.target = target;
     }
     public void setStack(int stack) { this.stack = stack; }
+    public void clearCard() { this.cards = null; }
 
     public Card selectCard(Suit start) {
 
@@ -62,6 +63,7 @@ public class Player {
         }
 
         if (allowAllSuit || choice.getSuit() == start) {
+            cards.remove(choice);
             return choice;
         }
         else

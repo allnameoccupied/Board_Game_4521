@@ -44,6 +44,8 @@ public class Game {
                 winner = player;
         }
 
+        resetGame();
+
     }
 
     private void initRound() {
@@ -162,6 +164,15 @@ public class Game {
 
     private void setTrump(Suit trump) {
         this.trump = trump;
+    }
+
+    private void resetGame() {
+        for (Player player : players) {
+            player.setTarget(0);
+            player.setStack(0);
+            player.addScore(-1 * player.getScore());
+            player.clearCard();
+        }
     }
 
 }
