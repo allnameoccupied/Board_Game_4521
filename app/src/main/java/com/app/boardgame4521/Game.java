@@ -105,7 +105,24 @@ public class Game {
 
     private Card getWinner(Card card1, Card card2) {
 
-        return card1;
+        char[] ranks = {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'}; //replace '10' with 'T' for now
+        int rank1 = 0;
+        int rank2 = 0;
+
+        for (int i = 0; i < ranks.length; i++) {
+            if (ranks[i] == card1.getRank())
+                rank1 = i;
+        }
+
+        for (int i = 0; i < ranks.length; i++) {
+            if (ranks[i] == card2.getRank())
+                rank2 = i;
+        }
+
+        if (rank2 > rank1)
+            return card2;
+        else
+            return card1;
     }
 
     private void setTrump(Suit trump) {
