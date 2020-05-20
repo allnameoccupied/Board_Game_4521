@@ -31,6 +31,9 @@ public class Game {
         players.add(player4);
     }
 
+    public Player getPlayer(int pos) { return players.get(pos);}
+    public int getRound() { return round;}
+
     public void initGame() {
         for(int i = 0; i < 52; ++i){ //shuffle
             int rnd = new Random().nextInt(52);
