@@ -30,5 +30,9 @@ public class Player {
 
         return true;
     }
+
+    public void addScore(int winning) {
+        this.score += winning;
+    }
 }
 
