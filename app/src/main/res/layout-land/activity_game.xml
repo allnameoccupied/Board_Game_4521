@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
         android:text="@string/round"
         android:textStyle="bold"
         app:layout_constraintRight_toLeftOf="@id/trump_text"
@@ -50,6 +50,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="100dp"
         android:layout_marginEnd="100dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
@@ -70,96 +71,96 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/card1"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card2"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_10c" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card3"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card4"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card5"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card6"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card7"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card8"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card9"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card10"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card11"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card12"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card13"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/card_2h" />
+            app:srcCompat="@drawable/gray_back" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
