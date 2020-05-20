@@ -10,9 +10,9 @@ import java.util.Random;
 public class Game {
     private List<Player> players;
     private Suit trump;
-    private int[] scores = new int[4];
+    private int[] scores = {0, 0, 0, 0};
     private final List<Card> cardPile = new ArrayList<>();
-    private int round = 0;
+    private int round = 1;
 
     public Game() {
         for (Suit s : Suit.values()) {
@@ -38,8 +38,95 @@ public class Game {
             cardPile.set(rnd, cardPile.get(i));
             cardPile.set(i, tmp);
         }
+
+        for (int i = 0; i < round; i += 4) {
+            for (int j = 0; j < 4; j++) {
+                players.get(j).addCard(cardPile.get(i + j));
+            }
+        }
+
+        if (round * 4 < 52)
+            setTrump(cardPile.get(round * 4).getSuit());
+        else
+            setTrump(cardPile.get(round * 4 - 1).getSuit());
+
+        // need to ask user input
+        for (int i = 0; i < 4; i++) {
+            players.get((((round - 1) % 4) + i) % 4).setTarget(1);
+        }
     }
-    public void deal(){
+
+    public void startGame() {
+
+        firstTrial();
+        for (int i = 1; i < round; i++) {
+            nextTrial();
+        }
+
+    }
+
+    private Player firstTrial() {
+
+        List<Card> pile = new ArrayList<>();
+
+        Card card1 = players.get((round - 1) % 4).selectCard(null);
+        pile.add(card1);
+        Suit start = card1.getSuit();
+        // need to ask user input
+        for (int i = 1; i < 4; i++) {
+            pile.add(players.get((((round - 1) % 4) + i) % 4).selectCard(start));
+        }
+
+        Card winner = pile.get(0);
+        for (Card card : pile) {
+            if (winner.getSuit() == card.getSuit()) {
+                winner = getWinner(winner, card);
+            }
+            else {
+                if (card.getSuit() == trump)
+                    winner = card;
+            }
+        }
+
+        return players.get((((round - 1) % 4) + pile.indexOf(winner)) % 4);
+    }
+
+    private void nextTrial() {
+
+    }
+
+    private Card getWinner(Card card1, Card card2) {
+
+        char[] ranks = {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'}; //replace '10' with 'T' for now
+        int rank1 = 0;
+        int rank2 = 0;
+
+        for (int i = 0; i < ranks.length; i++) {
+            if (ranks[i] == card1.getRank())
+                rank1 = i;
+        }
+
+        for (int i = 0; i < ranks.length; i++) {
+            if (ranks[i] == card2.getRank())
+                rank2 = i;
+        }
+
+        if (rank2 > rank1)
+            return card2;
+        else
+            return card1;
+    }
+
+    private void setTrump(Suit trump) {
+        this.trump = trump;
+    }
+
+    public Player dealround() {
+
+        return players.get(0);
+    }
+
+    public void dealGame(){
 
     }
 
