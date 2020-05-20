@@ -10,17 +10,21 @@ public class Player {
     private String name;
     private int score;
     private int target;
+    private int stack;
     private Position position;
     private List<Card> cards;
 
     protected Player(String name, Position position){
         this.name = name;
+        this.target = 0;
+        this.stack = 0;
         this.position = position;
         this.cards = new ArrayList<>();
     }
     public String getName() { return name; }
     public int getScore() { return score; }
     public int getTarget() { return target; }
+    public int getStack() { return stack; }
     public Position getPosition() { return position; }
     public List<Card> getCards() { return cards; }
 
@@ -45,6 +49,7 @@ public class Player {
     public void setTarget(int target) {
         this.target = target;
     }
+    public void setStack(int stack) { this.stack = stack; }
 
     public Card selectCard(Suit start) {
 
