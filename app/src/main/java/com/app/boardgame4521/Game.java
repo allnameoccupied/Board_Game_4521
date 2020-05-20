@@ -10,24 +10,16 @@ import java.util.Random;
 public class Game {
     private List<Player> players;
     private Suit trump;
-    private int[] scores = new int[2];
+    private int[] scores = new int[4];
     private final List<Card> cardPile = new ArrayList<>();
     private int round = 0;
 
     public Game() {
         for (Suit s : Suit.values()) {
-            Card cardA = new Card('A', s);
-            cardPile.add(cardA);
-            for (int i = 2; i < 11; ++i) { //2-10
-                Card card = new Card((char) i, s);
+            for (int i = 2; i < 15; ++i) { // 2-10, J, Q, K, A
+                Card card = new Card(i, s);
                 cardPile.add(card);
             }
-            Card cardJ = new Card('J', s);
-            Card cardQ = new Card('Q', s);
-            Card cardK = new Card('K', s);
-            cardPile.add(cardJ);
-            cardPile.add(cardQ);
-            cardPile.add(cardK);
         }
         Player player1 = new Player("A", Position.E);
         Player player2 = new Player("B", Position.S);
@@ -46,7 +38,6 @@ public class Game {
             cardPile.set(rnd, cardPile.get(i));
             cardPile.set(i, tmp);
         }
-
     }
     public void deal(){
 
