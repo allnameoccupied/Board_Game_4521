@@ -49,62 +49,51 @@
         app:srcCompat="@drawable/heart" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/table"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         app:layout_constraintBottom_toTopOf="@+id/cards"
         app:layout_constraintLeft_toRightOf="@id/west_data"
         app:layout_constraintRight_toLeftOf="@id/east_data"
         app:layout_constraintTop_toBottomOf="@+id/round_number">
 
-        <TextView
-            android:id="@+id/myTarget"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:text="0"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/bt_down" />
-
-        <ImageButton
-            android:id="@+id/bt_down"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="5dp"
+        <ImageView
+            android:id="@+id/west_card"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@android:drawable/arrow_down_float" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gray_back" />
 
-        <ImageButton
-            android:id="@+id/bt_up"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="5dp"
+        <ImageView
+            android:id="@+id/east_card"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/myTarget"
-            app:srcCompat="@android:drawable/arrow_up_float" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gray_back" />
 
-        <TextView
-            android:id="@+id/target_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:text="@string/target"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/bt_down"
-            app:layout_constraintStart_toStartOf="parent" />
+        <ImageView
+            android:id="@+id/north_card"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/gray_back" />
 
-        <Button
-            android:id="@+id/bt_confirm"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginBottom="5dp"
-            android:text="Confirm"
+        <ImageView
+            android:id="@+id/myCard"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/bt_up" />
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:srcCompat="@drawable/gray_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -137,17 +126,28 @@
         android:id="@+id/cards"
         android:layout_width="0dp"
         android:layout_height="100dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/my_data"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintEnd_toStartOf="@id/my_data"
+        app:layout_constraintStart_toEndOf="@id/targetBox">
+
+        <ImageView
+            android:id="@+id/card0"
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:onClick="selectCardHandler"
+            android:visibility="visible"
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card1"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="visible"
             app:srcCompat="@drawable/gray_back" />
 
@@ -156,6 +156,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="visible"
             app:srcCompat="@drawable/gray_back" />
 
@@ -164,6 +165,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="visible"
             app:srcCompat="@drawable/gray_back" />
 
@@ -172,7 +174,8 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:visibility="visible"
+            android:onClick="selectCardHandler"
+            android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
         <ImageView
@@ -180,6 +183,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -188,6 +192,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -196,6 +201,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -204,6 +210,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -212,6 +219,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -220,6 +228,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -228,6 +237,7 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
@@ -236,16 +246,10 @@
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:onClick="selectCardHandler"
             android:visibility="gone"
             app:srcCompat="@drawable/gray_back" />
 
-        <ImageView
-            android:id="@+id/card13"
-            android:layout_width="50dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:visibility="gone"
-            app:srcCompat="@drawable/gray_back" />
     </LinearLayout>
 
     <LinearLayout
@@ -341,7 +345,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/cards"
         app:layout_constraintLeft_toRightOf="@id/west_player"
-        app:layout_constraintTop_toBottomOf="@id/trump_img">
+        app:layout_constraintTop_toTopOf="@id/table">
 
         <TextView
             android:id="@+id/west_target"
@@ -373,6 +377,61 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/trump_img"
         app:srcCompat="@drawable/user_icon" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/targetBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/target_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/target"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/bt_down"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/bt_down"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toTopOf="@+id/bt_confirm"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@android:drawable/arrow_down_float" />
+
+        <TextView
+            android:id="@+id/myTarget"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:text="0"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            app:layout_constraintBottom_toTopOf="@+id/bt_confirm"
+            app:layout_constraintStart_toEndOf="@+id/bt_down" />
+
+        <ImageButton
+            android:id="@+id/bt_up"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/bt_confirm"
+            app:layout_constraintStart_toEndOf="@+id/myTarget"
+            app:srcCompat="@android:drawable/arrow_up_float" />
+
+        <Button
+            android:id="@+id/bt_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Confirm"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 

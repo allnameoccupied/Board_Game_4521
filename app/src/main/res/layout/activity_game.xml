@@ -49,7 +49,7 @@
         app:srcCompat="@drawable/heart" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/table"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="100dp"
@@ -122,6 +122,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/card0"
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/gray_back" />
 
         <ImageView
             android:id="@+id/card1"
@@ -202,13 +209,6 @@
 
         <ImageView
             android:id="@+id/card12"
-            android:layout_width="50dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/gray_back" />
-
-        <ImageView
-            android:id="@+id/card13"
             android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
