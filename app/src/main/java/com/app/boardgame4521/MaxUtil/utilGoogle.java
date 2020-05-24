@@ -13,7 +13,14 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -36,10 +43,15 @@ public final class utilGoogle {
         googleSignInClient = GoogleSignIn.getClient(APP_CONTEXT,signInOptions);
 
         //firebase part
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+//        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //firestore part
         firestore = FirebaseFirestore.getInstance();
+
+        //firebase force re-login
+        if (isUserSignedInGoogle()){
+            signInFirebase();
+        }
     }
 
     //GOOGLE
@@ -67,6 +79,7 @@ public final class utilGoogle {
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
         try {
             googleAccount = task.getResult(ApiException.class);
+            signInFirebase();
         } catch (Throwable e){
             util.log(e.getMessage());
         }
@@ -85,11 +98,13 @@ public final class utilGoogle {
 
     public static void signInFirebase(){
         if (!isUserSignedInGoogle()){return;}
+        logoutFirebase();
         AuthCredential credential = GoogleAuthProvider.getCredential(googleAccount.getIdToken(),null);
         FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                         if (task.isSuccessful()){
                             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                            uponLogin();
                         }
                 });
     }
@@ -98,6 +113,28 @@ public final class utilGoogle {
 
     //FIRESTORE
     private static FirebaseFirestore firestore;
+
+    private static final CollectionReference USER_COLLECTION = firestore.collection("users");
+    private static final CollectionReference ACTIVE_ROOM_COLLECTION = firestore.collection("active_room");
+
+    /** add code here if u want to do sth with firestore upon user login*/
+    private static void uponLogin(){
+        //check if new user
+        DocumentReference userRef = USER_COLLECTION.document(firebaseUser.getEmail());
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                if (!task.getResult().exists()){
+                    userRef.set()
+                }
+            }
+        });
+    }
+
+    private static Map<String,Object> genMapforCurrentFirebaseUser(){
+        Map<String,Object> userMap = new HashMap<>();
+        userMap.put("name",firebaseUser.getDisplayName());
+        userMap.put("update_time", FieldValue.serverTimestamp());
+    }
 
     public static FirebaseFirestore getFirestore(){return firestore;}
 }
