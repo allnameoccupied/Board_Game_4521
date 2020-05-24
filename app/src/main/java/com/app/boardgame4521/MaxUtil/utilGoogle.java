@@ -124,17 +124,17 @@ public final class utilGoogle {
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 if (!task.getResult().exists()){
-                    userRef.set()
+//                    userRef.set()
                 }
             }
         });
     }
 
-    private static Map<String,Object> genMapforCurrentFirebaseUser(){
-        Map<String,Object> userMap = new HashMap<>();
-        userMap.put("name",firebaseUser.getDisplayName());
-        userMap.put("update_time", FieldValue.serverTimestamp());
-    }
+//    private static Map<String,Object> genMapforCurrentFirebaseUser(){
+//        Map<String,Object> userMap = new HashMap<>();
+//        userMap.put("name",firebaseUser.getDisplayName());
+//        userMap.put("update_time", FieldValue.serverTimestamp());
+//    }
 
     public static FirebaseFirestore getFirestore(){return firestore;}
 }
