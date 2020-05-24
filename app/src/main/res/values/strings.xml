@@ -2,4 +2,6 @@
     <string name="app_name">PokerHub</string>
     <string name="trump">Trump:</string>
     <string name="round">Round:</string>
+    <string name="target">Target:</string>
+    <string name="win_trick">Stack: 0</string>
 </resources>
