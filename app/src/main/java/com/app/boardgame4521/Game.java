@@ -11,15 +11,17 @@ public class Game {
     private List<Player> players = new ArrayList<>();
     private Suit trump;
     private final List<Card> cardPile = new ArrayList<>();
-    private int round = 1;
-
-    public Game() {
+    {
         for (Suit s : Suit.values()) {
             for (int i = 2; i < 15; ++i) { // 2-10, J, Q, K, A
                 Card card = new Card(i, s);
                 cardPile.add(card);
             }
         }
+    }
+    private int round = 1;
+
+    public Game() {
         Player player1 = new Player("A", Position.E);
         Player player2 = new Player("B", Position.S);
         Player player3 = new Player("C", Position.W);

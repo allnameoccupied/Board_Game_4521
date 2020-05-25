@@ -1,30 +1,46 @@
 package com.app.boardgame4521;
 
 import android.content.res.Resources;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
+//import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 
 public class GameActivity extends AppCompatActivity {
 
     Game game = new Game();
-    int rnd = new Random().nextInt() % 4;
     Player thisUser = game.getPlayers().get(1); //need to change
+
     TextView myTarget;
     ImageView trump_img;
     private int tmpTarget = 0;
     private ImageView[] cardImgs = new ImageView[13];
     private boolean selectingCard = true;
-    private ImageView myCard;
+    boolean validPlay = true;
+    private ImageView my_card;
+    private ImageView east_card;
+    private ImageView west_card;
+    private ImageView north_card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +52,12 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.bt_confirm).setOnClickListener(this::targetConfirmHandler);
         myTarget = findViewById(R.id.myTarget);
         trump_img = findViewById(R.id.trump_img);
-        myCard = findViewById(R.id.myCard);
+        my_card = findViewById(R.id.myCard);
+        east_card = findViewById(R.id.east_card);
+        west_card = findViewById(R.id.west_card);
+        north_card = findViewById(R.id.north_card);
         initCardImgArray();
         refreshCardImg();
-//        game.startGame();
-//        setTrumpImg(Suit.Club);
     }
 
     public void targetDownHandler(View view) {
@@ -67,16 +84,41 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.bt_up).setEnabled(true);
     }
 
-    public void selectCardHandler(View view){
-        if(selectingCard) {
-            setTrumpImg(Suit.Club);
+    public void selectCardHandler(View view) {
+        int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
+        if (selectingCard && validPlay) {
             view.setVisibility(View.GONE);
-            int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
+            Card card1 = new Card(10, Suit.Diamond);//need to change
+            setPlayCard(Position.S, card1);
+        }
+    }
+
+    public void setPlayCard(Position pos, Card card) {
+        Resources res = getResources();
+        String mDrawableName = "card_" + card.getRank()
+                + card.getSuit().toString().substring(0, 1).toLowerCase();
+        int resID = res.getIdentifier(mDrawableName, "drawable", getPackageName());
+        switch (pos) {
+            case E:
+                east_card.setVisibility(View.VISIBLE);
+                east_card.setImageResource(resID);
+                break;
+            case S:
+                my_card.setVisibility(View.VISIBLE);
+                my_card.setImageResource(resID);
+                break;
+            case W:
+                west_card.setVisibility(View.VISIBLE);
+                west_card.setImageResource(resID);
+                break;
+            case N:
+                north_card.setVisibility(View.VISIBLE);
+                north_card.setImageResource(resID);
+                break;
         }
     }
 
     public void setTrumpImg(Suit suit) {
-        String path = "R.drawable." + suit.toString().toLowerCase();
         switch (suit) {
             case Diamond:
                 trump_img.setImageResource(R.drawable.diamond);
@@ -104,19 +146,19 @@ public class GameActivity extends AppCompatActivity {
         pile.add(card2);
         pile.add(card3);
         for (Suit s : Suit.values()) {
-                Card card = new Card(2, s);
-                pile.add(card);
+            Card card = new Card(2, s);
+            pile.add(card);
         }
 
         for (int i = 0; i < pile.size(); ++i) { //loading images
             Resources res = getResources();
             String mDrawableName = "card_" + pile.get(i).getRank()
-                    + pile.get(i).getSuit().toString().substring(0,1).toLowerCase();
+                    + pile.get(i).getSuit().toString().substring(0, 1).toLowerCase();
             int resID = res.getIdentifier(mDrawableName, "drawable", getPackageName());
             cardImgs[i].setVisibility(View.VISIBLE);
             cardImgs[i].setImageResource(resID);
         }
-        for(int i = pile.size();i < 13; ++i){ //remove remaining card images
+        for (int i = pile.size(); i < 13; ++i) { //remove remaining card images
             cardImgs[i].setVisibility(View.GONE);
         }
     }
@@ -135,7 +177,7 @@ public class GameActivity extends AppCompatActivity {
         cardImgs[10] = findViewById(R.id.card10);
         cardImgs[11] = findViewById(R.id.card11);
         cardImgs[12] = findViewById(R.id.card12);
-        for (int i = 0; i < 13; ++i){
+        for (int i = 0; i < 13; ++i) {
             cardImgs[i].setTag(i);
         }
     }
