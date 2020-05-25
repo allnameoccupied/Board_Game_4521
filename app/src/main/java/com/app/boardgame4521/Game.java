@@ -1,16 +1,27 @@
 package com.app.boardgame4521;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Game {
     private List<Player> players = new ArrayList<>();
     private Suit trump;
     private final List<Card> cardPile = new ArrayList<>();
+
     {
         for (Suit s : Suit.values()) {
             for (int i = 2; i < 15; ++i) { // 2-10, J, Q, K, A
@@ -19,17 +30,33 @@ public class Game {
             }
         }
     }
+
     private int round = 1;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Map<String, Object> playersInDb = new HashMap<>();
 
     public Game() {
-        Player player1 = new Player("A", Position.E);
-        Player player2 = new Player("B", Position.S);
-        Player player3 = new Player("C", Position.W);
-        Player player4 = new Player("D", Position.N);
+        Player player0 = new Player("A", Position.E);
+        Player player1 = new Player("B", Position.S);
+        Player player2 = new Player("C", Position.W);
+        Player player3 = new Player("D", Position.N);
+        players.add(player0);
         players.add(player1);
         players.add(player2);
         players.add(player3);
-        players.add(player4);
+        playersInDb.put("player0", player0);
+        playersInDb.put("player1", player1);
+        playersInDb.put("player2", player2);
+        playersInDb.put("player3", player3);
+
+        db.collection("active_room").document("players").set(playersInDb)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("Game", "Players added");
+                    } else {
+                        Log.d("game", "Error when adding players");
+                    }
+                });
     }
 
     public List<Player> getPlayers() {
@@ -39,6 +66,7 @@ public class Game {
     public int getRound() {
         return round;
     }
+
     // Note:
     // startGame is a complete game run for a total of 13 round
     // Need to take care user input for trump, target, cards and bid
@@ -60,9 +88,9 @@ public class Game {
 
     }
 
-    private void initRound() {
+    public void initRound() {
         // shuffle
-        for(int i = 0; i < 52; ++i){
+        for (int i = 0; i < 52; ++i) {
             int rnd = new Random().nextInt(52);
             Card tmp = cardPile.get(rnd);
             cardPile.set(rnd, cardPile.get(i));
@@ -73,8 +101,18 @@ public class Game {
         for (int i = 0; i < round; i += 4) {
             for (int j = 0; j < 4; j++) {
                 players.get(j).addCard(cardPile.get(i + j));
+                String key = "player" + j;
+                playersInDb.put(key, players.get(j));
             }
         }
+        db.collection("active_room").document("players").set(playersInDb)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("Game", "Cards added");
+                    } else {
+                        Log.d("Game", "Error when adding cards");
+                    }
+                });
 
         // get the trump
         if (round * 4 < 52)
@@ -137,8 +175,7 @@ public class Game {
             if (winner.getSuit() == card.getSuit()) {
                 if (card.getRank() > winner.getRank())
                     winner = card;
-            }
-            else {
+            } else {
                 if (card.getSuit() == trump)
                     winner = card;
             }
@@ -164,8 +201,7 @@ public class Game {
             if (winner.getSuit() == card.getSuit()) {
                 if (card.getRank() > winner.getRank())
                     winner = card;
-            }
-            else {
+            } else {
                 if (card.getSuit() == trump)
                     winner = card;
             }
@@ -176,6 +212,15 @@ public class Game {
 
     private void setTrump(Suit trump) {
         this.trump = trump;
+        playersInDb.put("trump", trump);
+        db.collection("active_room").document("players").set(playersInDb)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("Game", "trump changed");
+                    } else {
+                        Log.d("Game", "Error when changing trump");
+                    }
+                });
     }
 
     private void resetGame() {

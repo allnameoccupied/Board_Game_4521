@@ -1,35 +1,28 @@
 package com.app.boardgame4521;
 
 import android.content.res.Resources;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
-//import com.google.firebase.database.DatabaseReference;
-//import com.google.firebase.database.FirebaseDatabase;
-//import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity {
 
     Game game = new Game();
-    Player thisUser = game.getPlayers().get(1); //need to change
+    Player thisPlayer = game.getPlayers().get(1); //need to change
 
     TextView myTarget;
     ImageView trump_img;
@@ -41,6 +34,9 @@ public class GameActivity extends AppCompatActivity {
     private ImageView east_card;
     private ImageView west_card;
     private ImageView north_card;
+
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    DocumentReference ref = db.collection("active_room").document("players");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +53,25 @@ public class GameActivity extends AppCompatActivity {
         west_card = findViewById(R.id.west_card);
         north_card = findViewById(R.id.north_card);
         initCardImgArray();
-        refreshCardImg();
+        game.initRound();
+        ref.get().addOnCompleteListener((task) -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        if (document.exists()) {
+                            thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
+                            setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
+                            Log.d("GameActivity", "DocumentSnapshot data");
+                        } else {
+                            Log.d("GameActivity", "No such document");
+                        }
+                    }
+                } else {
+                    Log.d("GameActivity", "get failed with ", task.getException());
+                }
+        });
+        refreshCardImg(thisPlayer);
+
     }
 
     public void targetDownHandler(View view) {
@@ -86,6 +100,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void selectCardHandler(View view) {
         int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
+//        Card c = thisPlayer.getCards().get(cardNo);
         if (selectingCard && validPlay) {
             view.setVisibility(View.GONE);
             Card card1 = new Card(10, Suit.Diamond);//need to change
@@ -135,20 +150,21 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void refreshCardImg(/*Player player*/) {
-        List<Card> pile = new ArrayList<>();
-        //= player.getCards();
+    public void refreshCardImg(Player player) {
+        List<Card> pile;
+//        pile = new ArrayList<>();
+        pile = player.getCards();
         //example:
-        Card card1 = new Card(10, Suit.Diamond);
-        Card card2 = new Card(5, Suit.Heart);
-        Card card3 = new Card(8, Suit.Club);
-        pile.add(card1);
-        pile.add(card2);
-        pile.add(card3);
-        for (Suit s : Suit.values()) {
-            Card card = new Card(2, s);
-            pile.add(card);
-        }
+//        Card card1 = new Card(10, Suit.Diamond);
+//        Card card2 = new Card(5, Suit.Heart);
+//        Card card3 = new Card(8, Suit.Club);
+//        pile.add(card1);
+//        pile.add(card2);
+//        pile.add(card3);
+//        for (Suit s : Suit.values()) {
+//            Card card = new Card(2, s);
+//            pile.add(card);
+//        }
 
         for (int i = 0; i < pile.size(); ++i) { //loading images
             Resources res = getResources();
