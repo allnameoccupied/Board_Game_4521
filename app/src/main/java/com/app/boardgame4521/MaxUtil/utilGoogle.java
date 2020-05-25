@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -32,7 +33,7 @@ public final class utilGoogle {
         APP_CONTEXT = util.APP_CONTEXT;
 
         //google part
-//        googleAccount = GoogleSignIn.getLastSignedInAccount(APP_CONTEXT);
+        googleAccount = GoogleSignIn.getLastSignedInAccount(APP_CONTEXT);
         logoutGoogle();
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
@@ -43,7 +44,7 @@ public final class utilGoogle {
         googleSignInClient = GoogleSignIn.getClient(APP_CONTEXT,signInOptions);
 
         //firebase part
-//        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         logoutFirebase();
 
         //firestore part
@@ -86,9 +87,9 @@ public final class utilGoogle {
         }
     }
 
-    public static void logoutGoogle(){googleSignInClient.signOut();}
+    public static void logoutGoogle(){if (isUserSignedInGoogle())googleSignInClient.signOut();}
 
-    public static void disconnectGoogle(){googleSignInClient.revokeAccess();}
+    public static void disconnectGoogle(){if (isUserSignedInGoogle())googleSignInClient.revokeAccess();}
 
     //FIREBASE
     private static FirebaseUser firebaseUser;
@@ -110,7 +111,7 @@ public final class utilGoogle {
                 });
     }
 
-    public static void logoutFirebase(){FirebaseAuth.getInstance().signOut();}
+    public static void logoutFirebase(){if (isUserSignedInFirebase())FirebaseAuth.getInstance().signOut();}
 
     //FIRESTORE
     private static FirebaseFirestore firestore;
@@ -142,18 +143,23 @@ public final class utilGoogle {
             if (task.isSuccessful()){
                 if (!task.getResult().exists()){
                     //first time login
-//                    userRef.set();
+                    userRef.set(genMapforFirstTimeUser());
                 } else {
                     //already a user
+                    DocumentSnapshot userFromFirestore = task.getResult();
+
                 }
             }
         });
     }
 
-    private static Map<String,Object> genMapforCurrentFirebaseUser(){
+    private static Map<String,Object> genMapforFirstTimeUser(){
         Map<String,Object> userMap = new HashMap<>();
-        userMap.put("name",firebaseUser.getDisplayName());
-        userMap.put("update_time", FieldValue.serverTimestamp());
+        userMap.put("last_login", FieldValue.serverTimestamp());
+        userMap.put("level", 1);
+        userMap.put("match_played", 0);
+        userMap.put("name", googleAccount.getDisplayName());
+        userMap.put("reg_date", FieldValue.serverTimestamp());
         return userMap;
     }
 
