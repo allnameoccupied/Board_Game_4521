@@ -34,7 +34,6 @@ public final class utilGoogle {
 
         //google part
         googleAccount = GoogleSignIn.getLastSignedInAccount(APP_CONTEXT);
-        logoutGoogle();
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
                 .requestEmail()
@@ -42,6 +41,7 @@ public final class utilGoogle {
                 .requestServerAuthCode(utilConfidential.GOOGLE_LOGIN_CREDENTIAL)
                 .build();
         googleSignInClient = GoogleSignIn.getClient(APP_CONTEXT,signInOptions);
+        logoutGoogle();
 
         //firebase part
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
