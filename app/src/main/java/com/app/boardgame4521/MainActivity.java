@@ -46,14 +46,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void maxTestButtonHandler2(View view){
-        util.log(utilGoogle.getFirebaseUser().getEmail());
-    }
-
-    public void maxTestButtonHandler3(View view){
         util.log(User.getCurrentUser().isSet);
         util.log(User.getCurrentUser().email);
         util.log(User.getCurrentUser().name);
         util.log(User.getCurrentUser().reg_date.toString());
+    }
+
+    public void maxTestButtonHandler3(View view){
+        startActivity(new Intent(MainActivity.this,Room_Selection.class));
     }
 
     public void maxTestButtonHandler4(View view){
