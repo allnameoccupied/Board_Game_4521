@@ -1,6 +1,7 @@
 package com.app.boardgame4521;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -14,18 +15,26 @@ public class User {
 
     //data
     public boolean isSet = false;
-    public String name;
+    public String email;
+    public Timestamp last_login;
     public int level;
-    public Calendar reg_date;
-    public int start_playing_time;
+    public int match_played;
+    public String name;
+    public Timestamp reg_date;
 
     //func
     public static User getCurrentUser(){return currentUser.isSet?currentUser:null;}
 
-    public static void firstTimeSet(GoogleSignInAccount googleAC, FirebaseUser firebaseAC, DocumentSnapshot userDataFromFirestore){
+    public static void firstTimeSet(DocumentSnapshot userDataSnapshot){
         if (currentUser.isSet){return;}
         currentUser.isSet = true;
-        currentUser.name = firebaseAC.getDisplayName();
-        currentUser.level = (int) userDataFromFirestore.get("level");
+        currentUser.email = userDataSnapshot.getId();
+        currentUser.last_login = userDataSnapshot.getTimestamp("last_login");
+        currentUser.level = (int) userDataSnapshot.get("level");
+        currentUser.match_played = (int) userDataSnapshot.get("match_played");
+        currentUser.name = userDataSnapshot.getString("name");
+        currentUser.reg_date = userDataSnapshot.getTimestamp("reg_date");
     }
+
+    public static void resetUser(){currentUser = new User();}
 }

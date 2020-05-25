@@ -44,11 +44,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void maxTestButtonHandler2(View view){
-        utilGoogle.signInFirebase();
+        util.log(utilGoogle.getFirebaseUser().getEmail());
     }
 
     public void maxTestButtonHandler3(View view){
-        util.log(utilGoogle.getFirebaseUser().getEmail());
+        util.log(User.getCurrentUser().isSet);
+        util.log(User.getCurrentUser().email);
+        util.log(User.getCurrentUser().name);
+        util.log(User.getCurrentUser().reg_date.toString());
     }
 
     public void maxTestButtonHandler4(View view){

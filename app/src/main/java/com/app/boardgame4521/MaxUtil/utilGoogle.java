@@ -3,6 +3,7 @@ package com.app.boardgame4521.MaxUtil;
 import android.content.Context;
 import android.content.Intent;
 
+import com.app.boardgame4521.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -56,6 +58,11 @@ public final class utilGoogle {
 //        }
     }
 
+    //ONLINE READY
+    public static boolean isOnlineReady(){return isGoogleReady.get()&&isNetworkReady().get();}
+    public static AtomicBoolean isGoogleReady = new AtomicBoolean(false);
+    public static AtomicBoolean isNetworkReady(){return new AtomicBoolean(util.network_isNetworkConnected());};
+
     //GOOGLE
     private static GoogleSignInAccount googleAccount;
     private static GoogleSignInClient googleSignInClient;
@@ -87,18 +94,19 @@ public final class utilGoogle {
         }
     }
 
-    public static void logoutGoogle(){if (isUserSignedInGoogle())googleSignInClient.signOut();}
+    public static void logoutGoogle(){if (isUserSignedInGoogle())googleSignInClient.signOut();isGoogleReady.set(false);}
 
-    public static void disconnectGoogle(){if (isUserSignedInGoogle())googleSignInClient.revokeAccess();}
+    public static void disconnectGoogle(){if (isUserSignedInGoogle())googleSignInClient.revokeAccess();isGoogleReady.set(false);}
 
     //FIREBASE
+    //no longer need to be managed externally
     private static FirebaseUser firebaseUser;
 
     public static FirebaseUser getFirebaseUser(){return firebaseUser;}
 
     public static boolean isUserSignedInFirebase(){return firebaseUser != null;}
 
-    public static void signInFirebase(){
+    private static void signInFirebase(){
         if (!isUserSignedInGoogle()){return;}
         logoutFirebase();
         AuthCredential credential = GoogleAuthProvider.getCredential(googleAccount.getIdToken(),null);
@@ -111,7 +119,7 @@ public final class utilGoogle {
                 });
     }
 
-    public static void logoutFirebase(){if (isUserSignedInFirebase())FirebaseAuth.getInstance().signOut();}
+    private static void logoutFirebase(){if (isUserSignedInFirebase())FirebaseAuth.getInstance().signOut();isGoogleReady.set(false);}
 
     //FIRESTORE
     private static FirebaseFirestore firestore;
@@ -137,20 +145,29 @@ public final class utilGoogle {
         USER_COLLECTION = firestore.collection("users");
         ACTIVE_ROOM_COLLECTION = firestore.collection("active_room");
 
+        //create new user
+        User.resetUser();
+
         //check if new user
         DocumentReference userRef = USER_COLLECTION.document(firebaseUser.getEmail());
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 if (!task.getResult().exists()){
                     //first time login
-                    userRef.set(genMapforFirstTimeUser());
+                    userRef.set(genMapforFirstTimeUser()).addOnCompleteListener(task1 -> {
+                        userRef.get().addOnCompleteListener(task2 -> User.firstTimeSet(task2.getResult()));
+                    });
                 } else {
                     //already a user
-                    DocumentSnapshot userFromFirestore = task.getResult();
-
+                    userRef.set(genMapforReLoginUser()).addOnCompleteListener(task1 -> {
+                        userRef.get().addOnCompleteListener(task2 -> User.firstTimeSet(task2.getResult()));
+                    });
                 }
             }
         });
+
+        //set google stuff ready
+        isGoogleReady.set(true);
     }
 
     private static Map<String,Object> genMapforFirstTimeUser(){
@@ -160,6 +177,13 @@ public final class utilGoogle {
         userMap.put("match_played", 0);
         userMap.put("name", googleAccount.getDisplayName());
         userMap.put("reg_date", FieldValue.serverTimestamp());
+        return userMap;
+    }
+
+    private static Map<String,Object> genMapforReLoginUser(){
+        Map<String,Object> userMap = new HashMap<>();
+        userMap.put("last_login", FieldValue.serverTimestamp());
+        userMap.put("name", googleAccount.getDisplayName());
         return userMap;
     }
 
