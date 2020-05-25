@@ -8,6 +8,7 @@ import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -33,7 +34,7 @@ public class Game {
 
     private int round = 1;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Map<String, Object> playersInDb = new HashMap<>();
+    Map<String, Object> roomInDb = new HashMap<>();
 
     public Game() {
         Player player0 = new Player("A", Position.E);
@@ -44,12 +45,12 @@ public class Game {
         players.add(player1);
         players.add(player2);
         players.add(player3);
-        playersInDb.put("player0", player0);
-        playersInDb.put("player1", player1);
-        playersInDb.put("player2", player2);
-        playersInDb.put("player3", player3);
+        roomInDb.put("player0", player0);
+        roomInDb.put("player1", player1);
+        roomInDb.put("player2", player2);
+        roomInDb.put("player3", player3);
 
-        db.collection("active_room").document("players").set(playersInDb)
+        db.collection("active_room").document("room1").set(roomInDb)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("Game", "Players added");
@@ -102,10 +103,10 @@ public class Game {
             for (int j = 0; j < 4; j++) {
                 players.get(j).addCard(cardPile.get(i + j));
                 String key = "player" + j;
-                playersInDb.put(key, players.get(j));
+                roomInDb.put(key, players.get(j));
             }
         }
-        db.collection("active_room").document("players").set(playersInDb)
+        db.collection("active_room").document("room1").update(roomInDb)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("Game", "Cards added");
@@ -121,19 +122,37 @@ public class Game {
             setTrump(cardPile.get(round * 4 - 1).getSuit());
 
         // need to ask user target input
-        for (int i = 0; i < 4; i++) {
-            players.get((((round - 1) % 4) + i) % 4).setTarget(1);
 
-            if (i == 3) {
-                int totalTarget = 0;
-                for (Player player : players)
-                    totalTarget += player.getTarget();
-                if (totalTarget == round)
-                    players.get((((round - 1) % 4) + 3) % 4).setTarget(4); // need the last player to change his/her target
-            }
+        for (int i = 0; i < 4; i++) {
+//            setTargetListener(i);
+            //players.get((((round - 1) % 4) + i) % 4).setTarget(1);
+//            if (i == 3) {
+//                int totalTarget = 0;
+//                for (Player player : players)
+//                    totalTarget += player.getTarget();
+//                if (totalTarget == round)
+//                    players.get((((round - 1) % 4) + 3) % 4).setTarget(4); // need the last player to change his/her target
+//            }
         }
     }
 
+    private void setTargetListener(int userID){
+        final DocumentReference docRef = db.collection("active_room").document("room1");
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.w("Game", "Listen failed.", e);
+                return;
+            }
+            if (snapshot != null && snapshot.exists()) {
+                String path = "player" + userID;
+                Player p = (Player) snapshot.get(path);
+                players.get(userID).setTarget(p.getTarget());
+                Log.d("Game", "Current data: " + snapshot.getData());
+            } else {
+                Log.d("Game", "Current data: null");
+            }
+        });
+    }
     private void oneRound() {
 
         Player winner = firstTrial();
@@ -212,8 +231,8 @@ public class Game {
 
     private void setTrump(Suit trump) {
         this.trump = trump;
-        playersInDb.put("trump", trump);
-        db.collection("active_room").document("players").set(playersInDb)
+        roomInDb.put("trump", trump);
+        db.collection("active_room").document("room1").update(roomInDb)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("Game", "trump changed");

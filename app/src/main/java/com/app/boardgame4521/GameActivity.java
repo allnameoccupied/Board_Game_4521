@@ -26,9 +26,9 @@ public class GameActivity extends AppCompatActivity {
 
     TextView myTarget;
     ImageView trump_img;
+    TextView round_number;
     private int tmpTarget = 0;
     private ImageView[] cardImgs = new ImageView[13];
-    private boolean selectingCard = true;
     boolean validPlay = true;
     private ImageView my_card;
     private ImageView east_card;
@@ -36,7 +36,7 @@ public class GameActivity extends AppCompatActivity {
     private ImageView north_card;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    DocumentReference ref = db.collection("active_room").document("players");
+    DocumentReference ref = db.collection("active_room").document("room1");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,30 +48,36 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.bt_confirm).setOnClickListener(this::targetConfirmHandler);
         myTarget = findViewById(R.id.myTarget);
         trump_img = findViewById(R.id.trump_img);
+        round_number = findViewById(R.id.round_number);
         my_card = findViewById(R.id.myCard);
         east_card = findViewById(R.id.east_card);
         west_card = findViewById(R.id.west_card);
         north_card = findViewById(R.id.north_card);
         initCardImgArray();
         game.initRound();
-        ref.get().addOnCompleteListener((task) -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
-                            setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
-                            Log.d("GameActivity", "DocumentSnapshot data");
-                        } else {
-                            Log.d("GameActivity", "No such document");
-                        }
-                    }
-                } else {
-                    Log.d("GameActivity", "get failed with ", task.getException());
-                }
-        });
-        refreshCardImg(thisPlayer);
+        initRoundUI();
 
+    }
+
+    private void initRoundUI(){
+        ref.get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    if (document.exists()) {
+                        thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
+                        refreshCardImg(thisPlayer);
+                        setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
+                        round_number.setText(Objects.requireNonNull(document.get("round")).toString());
+                        Log.d("GameActivity", "DocumentSnapshot data");
+                    } else {
+                        Log.d("GameActivity", "No such document");
+                    }
+                }
+            } else {
+                Log.d("GameActivity", "get failed with ", task.getException());
+            }
+        });
     }
 
     public void targetDownHandler(View view) {
@@ -85,6 +91,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void targetConfirmHandler(View view) {
+
         lockBid();
     }
 
@@ -101,7 +108,7 @@ public class GameActivity extends AppCompatActivity {
     public void selectCardHandler(View view) {
         int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
 //        Card c = thisPlayer.getCards().get(cardNo);
-        if (selectingCard && validPlay) {
+        if (thisPlayer.isSelectingCard() && validPlay) {
             view.setVisibility(View.GONE);
             Card card1 = new Card(10, Suit.Diamond);//need to change
             setPlayCard(Position.S, card1);
@@ -146,6 +153,8 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case Spade:
                 trump_img.setImageResource(R.drawable.spade);
+                break;
+            default:
                 break;
         }
     }

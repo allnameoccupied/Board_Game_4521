@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.app.boardgame4521.MaxUtil.util;
 import com.app.boardgame4521.MaxUtil.utilGoogle;
