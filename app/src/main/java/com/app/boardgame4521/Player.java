@@ -14,6 +14,8 @@ public class Player {
     private Position position;
     private List<Card> cards;
 
+    public Player () {}
+
     protected Player(String name, Position position){
         this.name = name;
         this.target = 0;
@@ -27,6 +29,10 @@ public class Player {
     public int getStack() { return stack; }
     public Position getPosition() { return position; }
     public List<Card> getCards() { return cards; }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
+    }
 
     public void addScore(int winning) {
         this.score += winning;
