@@ -6,15 +6,18 @@ import com.app.boardgame4521.enumm.Suit;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class Player {
     private String name;
     private int score;
     private int target;
     private int stack;
-    public boolean selectingCard;
+    public boolean selectingCard = true;
     public boolean settingTarget;
     private Position position;
     private List<Card> cards = new ArrayList<>();
+    private Card playingCard = null;
 
     public Player () {}
 
@@ -28,11 +31,12 @@ public class Player {
     public int getStack() { return stack; }
     public Position getPosition() { return position; }
     public List<Card> getCards() { return cards; }
+    public Card getPlayingCard() { return playingCard; }
 
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
-
+    public void setPlayingCard(Card card) { this .playingCard = card; }
     public void addScore(int winning) {
         this.score += winning;
     }
@@ -63,6 +67,24 @@ public class Player {
         }
         else
             return null; // let the player choose again?
+
+    }
+
+    public boolean isValidPlay(Card choice, @Nullable Suit start) {
+
+        boolean allowAllSuit = true; // only true when the player doesnt have the starting suit
+
+        for (Card card : cards) {
+            if (card.getSuit() == start)
+                allowAllSuit = false;
+        }
+
+        if (allowAllSuit || choice.getSuit() == start) {
+            cards.remove(choice);
+            return true;
+        }
+        else
+            return false; // let the player choose again?
 
     }
 }

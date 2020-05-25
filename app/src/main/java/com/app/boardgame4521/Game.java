@@ -6,15 +6,9 @@ import androidx.annotation.Nullable;
 
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.MetadataChanges;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +19,11 @@ import java.util.Random;
 
 public class Game {
     private List<Player> players = new ArrayList<>();
-    private Suit trump;
+    private Suit trump = null;
+    private Suit startSuit = null;
     private final List<Card> cardPile = new ArrayList<>();
     private int totalTarget = 0;
-    Thread[] threads = new Thread[4];
+    Thread[] threads = new Thread[5];
 
     {
         for (Suit s : Suit.values()) {
@@ -55,7 +50,8 @@ public class Game {
         players.add(player3);
         //add room in db
         roomInDb.put("round", round);
-        roomInDb.put("trump", "");
+        roomInDb.put("trump", null);
+        roomInDb.put("startSuit", null);
         db.collection("active_room").document("room1").set(roomInDb)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -86,6 +82,11 @@ public class Game {
         return round;
     }
 
+    public Suit getTrump() { return trump; }
+
+    public Suit getStartSuit() { return startSuit; }
+
+    public void setStartSuit(Suit suit) {this.startSuit = suit;}
     // Note:
     // startGame is a complete game run for a total of 13 round
     // Need to take care user input for trump, target, cards and bid
@@ -152,13 +153,13 @@ public class Game {
 
         for (int i = 0; i < 4; i++) {
             int id = (((round - 1) % 4) + i) % 4;
-            addThread(id, i);
+            addThreadForTarget(id, i);
         }
 
     }
 
 
-    private void addThread(int id, int i) {
+    private void addThreadForTarget(int id, int i) {
         String path = "player" + id;
 
         threads[i] = new Thread(() -> {

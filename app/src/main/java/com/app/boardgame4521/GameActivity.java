@@ -24,8 +24,9 @@ import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity {
 
-    Game game = new Game();
+    static Game game = new Game();
     int myPos = 0;
+    String path = "player" + myPos;
     Player thisPlayer = game.getPlayers().get(myPos); //need to change
 
     TextView myTarget;
@@ -33,14 +34,13 @@ public class GameActivity extends AppCompatActivity {
     TextView round_number;
     private int tmpTarget = 0;
     private ImageView[] cardImgs = new ImageView[13];
-    boolean validPlay = true;
     private ImageView my_card;
     private ImageView east_card;
     private ImageView west_card;
     private ImageView north_card;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    DocumentReference ref = db.collection("active_room").document("room1");
+    DocumentReference rdb = db.collection("active_room").document("room1");
     CollectionReference pdb = db.collection("active_room").document("room1").collection("players");
 
     @Override
@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initRoundUI() {
-        ref.get().addOnCompleteListener((task) -> {
+        rdb.get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
@@ -81,7 +81,6 @@ public class GameActivity extends AppCompatActivity {
                 Log.d("GameActivity", "get failed with ", task.getException());
             }
         });
-        String path = "player" + myPos; //need change
         pdb.document(path).get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -114,7 +113,6 @@ public class GameActivity extends AppCompatActivity {
 
     public void targetConfirmHandler(View view) {
         if (thisPlayer.settingTarget) {
-            String path = "player" + myPos;
             //add target to db
             pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
                     .addOnCompleteListener(task -> {
@@ -159,11 +157,30 @@ public class GameActivity extends AppCompatActivity {
 
     public void selectCardHandler(View view) {
         int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
-//        Card c = thisPlayer.getCards().get(cardNo);
-        if (thisPlayer.selectingCard && validPlay) {
+        Card c = thisPlayer.getCards().get(cardNo);
+        Suit s = game.getStartSuit();
+        if (thisPlayer.selectingCard && thisPlayer.isValidPlay(c, s)) {
             view.setVisibility(View.GONE);
-            Card card1 = new Card(10, Suit.Diamond);//need to change
-            setPlayCard(Position.S, card1);
+            setPlayCard(Position.S, c);
+            thisPlayer.setPlayingCard(c);
+            if(s == null) game.setStartSuit(c.getSuit());
+            //add playing card to db
+            pdb.document(path).update("playingCard", thisPlayer.getPlayingCard())
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("GameActivity", "card played");
+                        } else {
+                            Log.d("GameActivity", "Error when playing card");
+                        }
+                    });
+            rdb.update("startSuit", c.getSuit())
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("GameActivity", "start suit set");
+                        } else {
+                            Log.d("GameActivity", "Error when setting start suit");
+                        }
+                    });
         }
     }
 
@@ -212,20 +229,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void refreshCardImg(Player player) {
-        List<Card> pile;
-//        pile = new ArrayList<>();
-        pile = player.getCards();
-        //example:
-//        Card card1 = new Card(10, Suit.Diamond);
-//        Card card2 = new Card(5, Suit.Heart);
-//        Card card3 = new Card(8, Suit.Club);
-//        pile.add(card1);
-//        pile.add(card2);
-//        pile.add(card3);
-//        for (Suit s : Suit.values()) {
-//            Card card = new Card(2, s);
-//            pile.add(card);
-//        }
+        List<Card> pile = player.getCards();
 
         for (int i = 0; i < pile.size(); ++i) { //loading images
             Resources res = getResources();
