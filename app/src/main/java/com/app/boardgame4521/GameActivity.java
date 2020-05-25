@@ -2,6 +2,8 @@ package com.app.boardgame4521;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -62,7 +64,7 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private void initRoundUI(){
+    private void initRoundUI() {
         ref.get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -111,8 +113,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void targetConfirmHandler(View view) {
-        if(thisPlayer.settingTarget) {
-            startBid();
+        if (thisPlayer.settingTarget) {
             String path = "player" + myPos;
             //add target to db
             pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
@@ -123,7 +124,6 @@ public class GameActivity extends AppCompatActivity {
                             Log.d("GameActivity", "Error when adding target");
                         }
                     });
-            thisPlayer.settingTarget = false;
             lockBid();
             //check if target needed to be changed
             pdb.document(path).get().addOnCompleteListener((task) -> {
@@ -143,6 +143,7 @@ public class GameActivity extends AppCompatActivity {
                     Log.d("GameActivity", "get failed with ", task.getException());
                 }
             });
+            thisPlayer.settingTarget = false;
         }
     }
 
