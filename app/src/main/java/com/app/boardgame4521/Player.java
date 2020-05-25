@@ -11,8 +11,8 @@ public class Player {
     private int score;
     private int target;
     private int stack;
-    private boolean selectingCard;
-    private boolean settingTarget;
+    public boolean selectingCard;
+    public boolean settingTarget;
     private Position position;
     private List<Card> cards = new ArrayList<>();
 
@@ -28,7 +28,6 @@ public class Player {
     public int getStack() { return stack; }
     public Position getPosition() { return position; }
     public List<Card> getCards() { return cards; }
-    public boolean isSelectingCard() { return selectingCard; }
 
     public void setCards(List<Card> cards) {
         this.cards = cards;

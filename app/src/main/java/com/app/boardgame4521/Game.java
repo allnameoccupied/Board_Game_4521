@@ -2,11 +2,19 @@ package com.app.boardgame4521;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.MetadataChanges;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +27,7 @@ public class Game {
     private Suit trump;
     private final List<Card> cardPile = new ArrayList<>();
     private int totalTarget = 0;
+
     {
         for (Suit s : Suit.values()) {
             for (int i = 2; i < 15; ++i) { // 2-10, J, Q, K, A
@@ -43,7 +52,7 @@ public class Game {
         players.add(player2);
         players.add(player3);
         //add room in db
-        roomInDb.put("round", 1);
+        roomInDb.put("round", round);
         roomInDb.put("trump", "");
         db.collection("active_room").document("room1").set(roomInDb)
                 .addOnCompleteListener(task -> {
@@ -65,7 +74,6 @@ public class Game {
                         }
                     });
         }
-
     }
 
     public List<Player> getPlayers() {
@@ -117,9 +125,9 @@ public class Game {
             pdb.document(path).update("cards", players.get(i).getCards())
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Log.d("Game", "Players added");
+                            Log.d("Game", "cards added");
                         } else {
-                            Log.d("Game", "Error when adding players");
+                            Log.d("Game", "Error when adding cards");
                         }
                     });
         }
@@ -131,19 +139,19 @@ public class Game {
 
         // need to ask user target input
         totalTarget = 0;
-        for (int i = 0; i < 4; i++) {
-            setTargetListener((((round - 1) % 4) + i) % 4, i);
-            if(i > 0){
-                boolean previous = false;
-
-            }
-        }
-    }
-
-    private void setTargetListener(int userID, int i) {
-        String path = "player" + userID;
-
-        // enable setting target
+//        for (int i = 0; i < 4; i++) {
+//            setTargetListener((((round - 1) % 4) + i) % 4, i);
+//            if(i > 0){
+//                while(players.get((((round - 1) % 4) + i - 1) % 4).settingTarget){ }
+//                //registration.remove();
+//                //setTargetListener((((round - 1) % 4) + i) % 4, i);
+//            }
+//        }
+        //registration.remove();
+        int id = (((round - 1) % 4)) % 4;
+        String path = "player" + id;
+        //enable setting target
+        players.get(id).settingTarget = true;
         pdb.document(path).update("settingTarget", true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -152,43 +160,110 @@ public class Game {
                         Log.d("Game", "Error when enable setting target");
                     }
                 });
-
-        //set listener, trigger when target is set
-        final DocumentReference docRef = pdb.document(path);
-        docRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                Log.w("Game", "Listen failed.", e);
-                return;
-            }
-            if (snapshot != null && snapshot.exists()) {
-                // disable setting target
-                pdb.document(path).update("settingTarget", false)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Log.d("Game", "disable setting target");
-                            } else {
-                                Log.d("Game", "Error when disable setting target");
-                            }
-                        });
-                int target = ((Long)snapshot.get("target")).intValue();
-                totalTarget += target;
-                //check if the target is valid
-                if (totalTarget == round && i == 3) {
-                    players.get((((round - 1) % 4) + 3) % 4).setTarget(target - 1); //change target in local
-                    pdb.document(path).update("target", target - 1) //change target in db
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Log.d("Game", "target changed");
-                                } else {
-                                    Log.d("Game", "Error when changing target");
-                                }
-                            });
+        //checking loop
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (players.get(id).settingTarget = false) {
+                        pdb.document(path).update("settingTarget", false)
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d("Game", "disable setting target in thread");
+                                    } else {
+                                        Log.d("Game", "Error when disable setting target in thread");
+                                    }
+                                });
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-                Log.d("Game", "Current data: " + snapshot.getData());
-            } else {
-                Log.d("Game", "Current data: null");
             }
         });
+        thread.start();
+    }
+
+    private void setTargetListener(int userID, int i) {
+        String path = "player" + userID;
+
+        // enable setting target
+        players.get(userID).settingTarget = true;
+        pdb.document(path).update("settingTarget", true)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("Game", "enable setting target");
+                    } else {
+                        Log.d("Game", "Error when enable setting target");
+                    }
+                });
+        //set listener, trigger when target is set
+//        registration = pdb.document(path).addSnapshotListener(MetadataChanges.INCLUDE, (snapshot, e) -> {
+//            // disable setting target
+//            players.get(userID).settingTarget = false;
+//            Log.d("Game", "listener");
+//            pdb.document(path).update("settingTarget", false)
+//                    .addOnCompleteListener(task -> {
+//                        if (task.isSuccessful()) {
+//                            Log.d("Game", "disable setting target");
+//                        } else {
+//                            Log.d("Game", "Error when disable setting target");
+//                        }
+//                    });
+//            int target = ((Long)snapshot.get("target")).intValue();
+//            totalTarget += target;
+//            //check if the target is valid
+//            if (totalTarget == round && i == 3) {
+//                players.get((((round - 1) % 4) + 3) % 4).setTarget(target - 1); //change target in local
+//                pdb.document(path).update("target", target - 1) //change target in db
+//                        .addOnCompleteListener(task -> {
+//                            if (task.isSuccessful()) {
+//                                Log.d("Game", "target changed");
+//                            } else {
+//                                Log.d("Game", "Error when changing target");
+//                            }
+//                        });
+//            }
+//        });
+
+//        final DocumentReference docRef = pdb.document(path);
+//        registration = docRef.addSnapshotListener((snapshot, e) -> {
+//            if (e != null) {
+//                Log.w("Game", "Listen failed.", e);
+//                return;
+//            }
+//            if (snapshot != null && snapshot.exists()) {
+//                // disable setting target
+//                players.get(userID).settingTarget = false;
+//                pdb.document(path).update("settingTarget", false)
+//                        .addOnCompleteListener(task -> {
+//                            if (task.isSuccessful()) {
+//                                Log.d("Game", "disable setting target");
+//                            } else {
+//                                Log.d("Game", "Error when disable setting target");
+//                            }
+//                        });
+//                int target = ((Long)snapshot.get("target")).intValue();
+//                totalTarget += target;
+//                //check if the target is valid
+//                if (totalTarget == round && i == 3) {
+//                    players.get((((round - 1) % 4) + 3) % 4).setTarget(target - 1); //change target in local
+//                    pdb.document(path).update("target", target - 1) //change target in db
+//                            .addOnCompleteListener(task -> {
+//                                if (task.isSuccessful()) {
+//                                    Log.d("Game", "target changed");
+//                                } else {
+//                                    Log.d("Game", "Error when changing target");
+//                                }
+//                            });
+//                }
+//                Log.d("Game", "Current data: " + snapshot.getData());
+//            } else {
+//                Log.d("Game", "Current data: null");
+//            }
+//        });
     }
 
     private void oneRound() {

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,6 +39,7 @@ public class GameActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     DocumentReference ref = db.collection("active_room").document("room1");
+    CollectionReference pdb = db.collection("active_room").document("room1").collection("players");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class GameActivity extends AppCompatActivity {
             }
         });
         String path = "player" + myPos; //need change
-        ref.collection("players").document(path).get().addOnCompleteListener((task) -> {
+        pdb.document(path).get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
@@ -109,11 +111,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void targetConfirmHandler(View view) {
-        if(thisPlayer.isSelectingCard()) {
+        if(thisPlayer.settingTarget) {
             startBid();
             String path = "player" + myPos;
             //add target to db
-            db.collection("active_room").document("room1").collection("players").document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
+            pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Log.d("GameActivity", "target added");
@@ -121,7 +123,10 @@ public class GameActivity extends AppCompatActivity {
                             Log.d("GameActivity", "Error when adding target");
                         }
                     });
-            ref.collection("players").document(path).get().addOnCompleteListener((task) -> {
+            thisPlayer.settingTarget = false;
+            lockBid();
+            //check if target needed to be changed
+            pdb.document(path).get().addOnCompleteListener((task) -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
@@ -138,7 +143,6 @@ public class GameActivity extends AppCompatActivity {
                     Log.d("GameActivity", "get failed with ", task.getException());
                 }
             });
-            lockBid();
         }
     }
 
@@ -155,7 +159,7 @@ public class GameActivity extends AppCompatActivity {
     public void selectCardHandler(View view) {
         int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
 //        Card c = thisPlayer.getCards().get(cardNo);
-        if (thisPlayer.isSelectingCard() && validPlay) {
+        if (thisPlayer.selectingCard && validPlay) {
             view.setVisibility(View.GONE);
             Card card1 = new Card(10, Suit.Diamond);//need to change
             setPlayCard(Position.S, card1);

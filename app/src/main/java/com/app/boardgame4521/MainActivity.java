@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setMessage("Please check your internet connection and login to Google to proceed");
             builder.setNeutralButton("OK",(dialog, which) -> dialog.dismiss());
             builder.show();
+            return;
         }
         //should seperate choose room and create room
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
