@@ -1,6 +1,7 @@
 package com.app.boardgame4521;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         util.INIT(getApplicationContext());
 
         //max test button init
-        findViewById(R.id.maxtest1).setOnClickListener(this::maxTestButtonHandler1);
+        findViewById(R.id.google_login).setOnClickListener(this::maxTestButtonHandler1);
         findViewById(R.id.maxtest2).setOnClickListener(this::maxTestButtonHandler2);
         findViewById(R.id.maxtest3).setOnClickListener(this::maxTestButtonHandler3);
         findViewById(R.id.maxtest4).setOnClickListener(this::maxTestButtonHandler4);
@@ -56,6 +57,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void maxTestButtonHandler4(View view){
+        if (!utilGoogle.isOnlineReady()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Please check your internet connection and login to Google to proceed");
+            builder.setNeutralButton("OK",(dialog, which) -> dialog.dismiss());
+            builder.show();
+        }
+        //should seperate choose room and create room
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
         startActivity(intent);
     }
