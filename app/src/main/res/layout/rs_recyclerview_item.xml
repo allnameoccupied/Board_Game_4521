@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
     </data>
 
-    <FrameLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/roomSelection_frag1_recycler_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="12dp"
         android:layout_marginStart="8dp"
@@ -17,20 +20,41 @@
 
         <TextView
             android:id="@+id/roomSelection_frag1_recycler_item_textview1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text=""
+            android:textSize="30sp"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
             android:id="@+id/roomSelection_frag1_recycler_item_textview2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text=""
+            android:textSize="30sp"
+            android:layout_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/roomSelection_frag1_recycler_item_textview3"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            tools:layout_editor_absoluteY="0dp">-->
+<!--            -->
+<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
 
         <TextView
             android:id="@+id/roomSelection_frag1_recycler_item_textview3"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:textSize="16sp" />
-    </FrameLayout>
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteY="0dp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.app.boardgame4521.MaxUtil.util;
 import com.app.boardgame4521.MaxUtil.utilGoogle;
@@ -24,6 +25,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,6 +62,7 @@ public class Room_Selection extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.room_selection_menu_item1:
                 util.log("add icon pressed");
+                //TODO add open new room
                 break;
             case R.id.room_selection_menu_item2:
                 if (Room_Selection_Frag1.thisFrag!=null){
@@ -79,6 +82,7 @@ public class Room_Selection extends AppCompatActivity {
         private NavController navController;
         private View view;
         public ArrayList<RS_Room> roomList = new ArrayList<>();
+        public RS_RecyclerView_Adapter adapter;
 
         //func
         @Override
@@ -88,6 +92,13 @@ public class Room_Selection extends AppCompatActivity {
             thisFrag = this;
         }
 
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            view = inflater.inflate(R.layout.room_selection_frag1,container,false);
+            return view;
+        }
+
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
@@ -95,31 +106,45 @@ public class Room_Selection extends AppCompatActivity {
             navController = NavHostFragment.findNavController(this);
 
             //set recycler view
+            this.view = view;
             updateRoomList();
         }
 
         public void updateRoomList(){
+            roomList = new ArrayList<>();
             RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.roomSelection_frag1_recycler);
             utilGoogle.getFirestore().collection("active_room").get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()){
                             for (DocumentSnapshot documentSnapshot : task.getResult()){
                                 roomList.add(new RS_Room(documentSnapshot));
+//                                util.log("qwer");
                             }
+//                            util.log(roomList.size());
+                            adapter.notifyDataSetChanged();
                         }
                     });
-            RS_RecyclerView_Adapter adapter = new RS_RecyclerView_Adapter(getContext(),roomList);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            adapter = new RS_RecyclerView_Adapter(getActivity(),roomList);
+//            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
+/** set item on click action here, the "room" object is the one clicked*/
+            adapter.setOnItemClickListener((view1, room) -> util.log(room.name));
         }
 
         //custom room class
         public static class RS_Room{
             //var
+            public String name;
+            public String host;
+            public int playerCount;
 
             //func
             public RS_Room(DocumentSnapshot roomData){
-
+                name = roomData.getId();
+                host = roomData.getString("host");
+                playerCount = ((Long)roomData.get("player_count")).intValue();
             }
         }
 
@@ -132,13 +157,18 @@ public class Room_Selection extends AppCompatActivity {
             public RS_RecyclerView_Adapter(Context context, ArrayList<RS_Room> roomList){
                 this.context = context;
                 this.roomList = roomList;
+//                util.log(roomList.size());
             }
 
             @Override
             public RS_RecyclerView_ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(context).inflate(R.layout.rs_recyclerview_item,parent,false);
+//                View view = LayoutInflater.from(context).inflate(R.layout.rs_recyclerview_item,parent,false);
+                View view = View.inflate(context,R.layout.rs_recyclerview_item,null);
                 RS_RecyclerView_ViewHolder holder = new RS_RecyclerView_ViewHolder(view);
                 //set item in holder to corr. view
+                holder.roomNameView = (TextView)view.findViewById(R.id.roomSelection_frag1_recycler_item_textview1);
+                holder.roomHostView = (TextView)view.findViewById(R.id.roomSelection_frag1_recycler_item_textview2);
+                holder.roomPlayerCountView = (TextView)view.findViewById(R.id.roomSelection_frag1_recycler_item_textview3);
                 return holder;
             }
 
@@ -146,6 +176,10 @@ public class Room_Selection extends AppCompatActivity {
             public void onBindViewHolder(@NonNull RS_RecyclerView_ViewHolder holder, int position) {
                 RS_Room room = roomList.get(position);
                 //set holder item to real data
+                holder.roomNameView.setText(room.name);
+                holder.roomHostView.setText(room.host);
+                holder.roomPlayerCountView.setText(room.playerCount +"/4");
+//                util.log("asdf");
             }
 
             @Override
@@ -154,13 +188,30 @@ public class Room_Selection extends AppCompatActivity {
             }
 
             //custom view holder for each item
-            public static class RS_RecyclerView_ViewHolder extends RecyclerView.ViewHolder{
+            public class RS_RecyclerView_ViewHolder extends RecyclerView.ViewHolder{
                 //var
+                public TextView roomNameView;
+                public TextView roomHostView;
+                public TextView roomPlayerCountView;
 
                 //func
                 public RS_RecyclerView_ViewHolder(@NonNull View itemView) {
                     super(itemView);
+                    itemView.setOnClickListener(v -> {
+                        if (onItemClickListener!=null){
+                            onItemClickListener.OnItemClick(itemView,roomList.get(getLayoutPosition()));
+                        }
+                    });
                 }
+            }
+
+            //custom on click listener
+            private OnItemClickListener onItemClickListener;
+            public interface OnItemClickListener{
+                public void OnItemClick(View view, RS_Room room);
+            }
+            public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+                this.onItemClickListener = onItemClickListener;
             }
         }
     }
