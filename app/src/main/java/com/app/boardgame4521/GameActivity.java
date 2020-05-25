@@ -22,7 +22,8 @@ import java.util.Objects;
 public class GameActivity extends AppCompatActivity {
 
     Game game = new Game();
-    Player thisPlayer = game.getPlayers().get(1); //need to change
+    int myPos = 0;
+    Player thisPlayer = game.getPlayers().get(myPos); //need to change
 
     TextView myTarget;
     ImageView trump_img;
@@ -76,7 +77,7 @@ public class GameActivity extends AppCompatActivity {
                 Log.d("GameActivity", "get failed with ", task.getException());
             }
         });
-        String path = "player" + 1; //need change
+        String path = "player" + myPos; //need change
         ref.collection("players").document(path).get().addOnCompleteListener((task) -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -96,18 +97,49 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void targetDownHandler(View view) {
-        if (tmpTarget > 0) tmpTarget--;
+        if (tmpTarget == 0) return;
+        tmpTarget--;
         myTarget.setText(String.valueOf(tmpTarget));
     }
 
     public void targetUpHandler(View view) {
-        if (tmpTarget < game.getRound()) tmpTarget++;
+        if (tmpTarget == game.getRound()) return;
+        tmpTarget++;
         myTarget.setText(String.valueOf(tmpTarget));
     }
 
     public void targetConfirmHandler(View view) {
-
-        lockBid();
+        if(thisPlayer.isSelectingCard()) {
+            startBid();
+            String path = "player" + myPos;
+            //add target to db
+            db.collection("active_room").document("room1").collection("players").document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("GameActivity", "target added");
+                        } else {
+                            Log.d("GameActivity", "Error when adding target");
+                        }
+                    });
+            ref.collection("players").document(path).get().addOnCompleteListener((task) -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        if (document.exists()) {
+                            if(!document.get("target").toString().equals(myTarget.getText().toString())){ //check if need to change or not
+                                myTarget.setText(document.get("target").toString());
+                            }
+                            Log.d("GameActivity", "DocumentSnapshot data");
+                        } else {
+                            Log.d("GameActivity", "No such document");
+                        }
+                    }
+                } else {
+                    Log.d("GameActivity", "get failed with ", task.getException());
+                }
+            });
+            lockBid();
+        }
     }
 
     public void lockBid() {

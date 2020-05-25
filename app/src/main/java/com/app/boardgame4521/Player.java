@@ -12,6 +12,7 @@ public class Player {
     private int target;
     private int stack;
     private boolean selectingCard;
+    private boolean settingTarget;
     private Position position;
     private List<Card> cards = new ArrayList<>();
 
