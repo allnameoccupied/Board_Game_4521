@@ -45,19 +45,30 @@ public class Game {
         players.add(player1);
         players.add(player2);
         players.add(player3);
-        roomInDb.put("player0", player0);
-        roomInDb.put("player1", player1);
-        roomInDb.put("player2", player2);
-        roomInDb.put("player3", player3);
-
+        //add room in db
+        roomInDb.put("round", 1);
+        roomInDb.put("trump", "");
         db.collection("active_room").document("room1").set(roomInDb)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("Game", "Players added");
+                        Log.d("Game", "Room added");
                     } else {
-                        Log.d("game", "Error when adding players");
+                        Log.d("game", "Error when adding room");
                     }
                 });
+        //add players in db
+        for (int i = 0; i < 4; ++i) {
+            String path = "player" + i;
+            db.collection("active_room").document("room1").collection("players").document(path).set(players.get(i))
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("Game", "Players added");
+                        } else {
+                            Log.d("game", "Error when adding players");
+                        }
+                    });
+        }
+
     }
 
     public List<Player> getPlayers() {
@@ -102,19 +113,19 @@ public class Game {
         for (int i = 0; i < round; i += 4) {
             for (int j = 0; j < 4; j++) {
                 players.get(j).addCard(cardPile.get(i + j));
-                String key = "player" + j;
-                roomInDb.put(key, players.get(j));
             }
         }
-        db.collection("active_room").document("room1").update(roomInDb)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("Game", "Cards added");
-                    } else {
-                        Log.d("Game", "Error when adding cards");
-                    }
-                });
-
+        for (int i = 0; i < 4; ++i) {
+            String path = "player" + i;
+            db.collection("active_room").document("room1").collection("players").document(path).update("cards", players.get(i).getCards())
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("Game", "Players added");
+                        } else {
+                            Log.d("game", "Error when adding players");
+                        }
+                    });
+        }
         // get the trump
         if (round * 4 < 52)
             setTrump(cardPile.get(round * 4).getSuit());
@@ -136,15 +147,15 @@ public class Game {
         }
     }
 
-    private void setTargetListener(int userID){
-        final DocumentReference docRef = db.collection("active_room").document("room1");
+    private void setTargetListener(int userID) {
+        String path = "player" + userID;
+        final DocumentReference docRef = db.collection("active_room").document("room1").collection("players").document(path);
         docRef.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
                 Log.w("Game", "Listen failed.", e);
                 return;
             }
             if (snapshot != null && snapshot.exists()) {
-                String path = "player" + userID;
                 Player p = (Player) snapshot.get(path);
                 players.get(userID).setTarget(p.getTarget());
                 Log.d("Game", "Current data: " + snapshot.getData());
@@ -153,6 +164,7 @@ public class Game {
             }
         });
     }
+
     private void oneRound() {
 
         Player winner = firstTrial();

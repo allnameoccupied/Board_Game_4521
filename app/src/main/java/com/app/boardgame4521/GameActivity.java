@@ -65,10 +65,25 @@ public class GameActivity extends AppCompatActivity {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
                     if (document.exists()) {
-                        thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
-                        refreshCardImg(thisPlayer);
                         setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
                         round_number.setText(Objects.requireNonNull(document.get("round")).toString());
+                        Log.d("GameActivity", "DocumentSnapshot data");
+                    } else {
+                        Log.d("GameActivity", "No such document");
+                    }
+                }
+            } else {
+                Log.d("GameActivity", "get failed with ", task.getException());
+            }
+        });
+        String path = "player" + 1; //need change
+        ref.collection("players").document(path).get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    if (document.exists()) {
+                        thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
+                        refreshCardImg(thisPlayer);
                         Log.d("GameActivity", "DocumentSnapshot data");
                     } else {
                         Log.d("GameActivity", "No such document");
