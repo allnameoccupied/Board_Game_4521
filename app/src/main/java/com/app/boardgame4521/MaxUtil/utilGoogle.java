@@ -159,7 +159,7 @@ public final class utilGoogle {
                     });
                 } else {
                     //already a user
-                    userRef.set(genMapforReLoginUser()).addOnCompleteListener(task1 -> {
+                    userRef.update(genMapforReLoginUser()).addOnCompleteListener(task1 -> {
                         userRef.get().addOnCompleteListener(task2 -> User.firstTimeSet(task2.getResult()));
                     });
                 }

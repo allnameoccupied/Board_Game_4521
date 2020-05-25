@@ -23,15 +23,15 @@ public class User {
     public Timestamp reg_date;
 
     //func
-    public static User getCurrentUser(){return currentUser.isSet?currentUser:null;}
+    public static User getCurrentUser(){return currentUser;}
 
     public static void firstTimeSet(DocumentSnapshot userDataSnapshot){
         if (currentUser.isSet){return;}
         currentUser.isSet = true;
         currentUser.email = userDataSnapshot.getId();
         currentUser.last_login = userDataSnapshot.getTimestamp("last_login");
-        currentUser.level = (int) userDataSnapshot.get("level");
-        currentUser.match_played = (int) userDataSnapshot.get("match_played");
+        currentUser.level = ((Long)userDataSnapshot.get("level")).intValue();
+        currentUser.match_played = ((Long)userDataSnapshot.get("match_played")).intValue();
         currentUser.name = userDataSnapshot.getString("name");
         currentUser.reg_date = userDataSnapshot.getTimestamp("reg_date");
     }

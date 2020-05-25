@@ -1,6 +1,7 @@
 package com.app.boardgame4521;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -55,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void maxTestButtonHandler4(View view){
+        if (!utilGoogle.isOnlineReady()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Please check your internet connection and login to Google to proceed");
+        }
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
         startActivity(intent);
     }
