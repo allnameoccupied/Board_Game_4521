@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.app.boardgame4521.enumm.Position;
 import com.app.boardgame4521.enumm.Suit;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,13 +23,14 @@ import java.util.Objects;
 public class GameActivity extends AppCompatActivity {
 
     Game game = new Game();
-    Player thisPlayer = game.getPlayers().get(1); //need to change
+    int myPos = 0;
+    Player thisPlayer = game.getPlayers().get(myPos); //need to change
 
     TextView myTarget;
     ImageView trump_img;
+    TextView round_number;
     private int tmpTarget = 0;
     private ImageView[] cardImgs = new ImageView[13];
-    private boolean selectingCard = true;
     boolean validPlay = true;
     private ImageView my_card;
     private ImageView east_card;
@@ -36,7 +38,8 @@ public class GameActivity extends AppCompatActivity {
     private ImageView north_card;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    DocumentReference ref = db.collection("active_room").document("players");
+    DocumentReference ref = db.collection("active_room").document("room1");
+    CollectionReference pdb = db.collection("active_room").document("room1").collection("players");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +51,89 @@ public class GameActivity extends AppCompatActivity {
         findViewById(R.id.bt_confirm).setOnClickListener(this::targetConfirmHandler);
         myTarget = findViewById(R.id.myTarget);
         trump_img = findViewById(R.id.trump_img);
+        round_number = findViewById(R.id.round_number);
         my_card = findViewById(R.id.myCard);
         east_card = findViewById(R.id.east_card);
         west_card = findViewById(R.id.west_card);
         north_card = findViewById(R.id.north_card);
         initCardImgArray();
         game.initRound();
+        initRoundUI();
+
+    }
+
+    private void initRoundUI(){
         ref.get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    if (document.exists()) {
+                        setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
+                        round_number.setText(Objects.requireNonNull(document.get("round")).toString());
+                        Log.d("GameActivity", "DocumentSnapshot data");
+                    } else {
+                        Log.d("GameActivity", "No such document");
+                    }
+                }
+            } else {
+                Log.d("GameActivity", "get failed with ", task.getException());
+            }
+        });
+        String path = "player" + myPos; //need change
+        pdb.document(path).get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    if (document.exists()) {
+                        thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
+                        refreshCardImg(thisPlayer);
+                        Log.d("GameActivity", "DocumentSnapshot data");
+                    } else {
+                        Log.d("GameActivity", "No such document");
+                    }
+                }
+            } else {
+                Log.d("GameActivity", "get failed with ", task.getException());
+            }
+        });
+    }
+
+    public void targetDownHandler(View view) {
+        if (tmpTarget == 0) return;
+        tmpTarget--;
+        myTarget.setText(String.valueOf(tmpTarget));
+    }
+
+    public void targetUpHandler(View view) {
+        if (tmpTarget == game.getRound()) return;
+        tmpTarget++;
+        myTarget.setText(String.valueOf(tmpTarget));
+    }
+
+    public void targetConfirmHandler(View view) {
+        if(thisPlayer.settingTarget) {
+            startBid();
+            String path = "player" + myPos;
+            //add target to db
+            pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("GameActivity", "target added");
+                        } else {
+                            Log.d("GameActivity", "Error when adding target");
+                        }
+                    });
+            thisPlayer.settingTarget = false;
+            lockBid();
+            //check if target needed to be changed
+            pdb.document(path).get().addOnCompleteListener((task) -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
                         if (document.exists()) {
-                            thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
-                            setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
+                            if(!document.get("target").toString().equals(myTarget.getText().toString())){ //check if need to change or not
+                                myTarget.setText(document.get("target").toString());
+                            }
                             Log.d("GameActivity", "DocumentSnapshot data");
                         } else {
                             Log.d("GameActivity", "No such document");
@@ -69,23 +142,8 @@ public class GameActivity extends AppCompatActivity {
                 } else {
                     Log.d("GameActivity", "get failed with ", task.getException());
                 }
-        });
-        refreshCardImg(thisPlayer);
-
-    }
-
-    public void targetDownHandler(View view) {
-        if (tmpTarget > 0) tmpTarget--;
-        myTarget.setText(String.valueOf(tmpTarget));
-    }
-
-    public void targetUpHandler(View view) {
-        if (tmpTarget < game.getRound()) tmpTarget++;
-        myTarget.setText(String.valueOf(tmpTarget));
-    }
-
-    public void targetConfirmHandler(View view) {
-        lockBid();
+            });
+        }
     }
 
     public void lockBid() {
@@ -101,7 +159,7 @@ public class GameActivity extends AppCompatActivity {
     public void selectCardHandler(View view) {
         int cardNo = Integer.parseInt(view.getTag().toString()); //the position of the card
 //        Card c = thisPlayer.getCards().get(cardNo);
-        if (selectingCard && validPlay) {
+        if (thisPlayer.selectingCard && validPlay) {
             view.setVisibility(View.GONE);
             Card card1 = new Card(10, Suit.Diamond);//need to change
             setPlayCard(Position.S, card1);
@@ -146,6 +204,8 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case Spade:
                 trump_img.setImageResource(R.drawable.spade);
+                break;
+            default:
                 break;
         }
     }

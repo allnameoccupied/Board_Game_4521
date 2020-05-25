@@ -1,18 +1,14 @@
 package com.app.boardgame4521;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.util.Calendar;
-
 //class for representing a user
 //use
 public class User {
     //one instance of current user
     private static User currentUser = new User();
-
     //data
     public boolean isSet = false;
     public String email;
@@ -35,6 +31,5 @@ public class User {
         currentUser.name = userDataSnapshot.getString("name");
         currentUser.reg_date = userDataSnapshot.getTimestamp("reg_date");
     }
-
     public static void resetUser(){currentUser = new User();}
 }

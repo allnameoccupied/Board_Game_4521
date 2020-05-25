@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.app.boardgame4521.MaxUtil.util;
 import com.app.boardgame4521.MaxUtil.utilGoogle;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setMessage("Please check your internet connection and login to Google to proceed");
             builder.setNeutralButton("OK",(dialog, which) -> dialog.dismiss());
             builder.show();
+            return;
         }
         //should seperate choose room and create room
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
