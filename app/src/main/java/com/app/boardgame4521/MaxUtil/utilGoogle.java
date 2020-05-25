@@ -20,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -33,7 +32,8 @@ public final class utilGoogle {
         APP_CONTEXT = util.APP_CONTEXT;
 
         //google part
-        googleAccount = GoogleSignIn.getLastSignedInAccount(APP_CONTEXT);
+//        googleAccount = GoogleSignIn.getLastSignedInAccount(APP_CONTEXT);
+        logoutGoogle();
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
                 .requestEmail()
@@ -44,14 +44,15 @@ public final class utilGoogle {
 
         //firebase part
 //        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        logoutFirebase();
 
         //firestore part
-        firestore = FirebaseFirestore.getInstance();
+//        firestore = FirebaseFirestore.getInstance();
 
         //firebase force re-login
-        if (isUserSignedInGoogle()){
-            signInFirebase();
-        }
+//        if (isUserSignedInGoogle()){
+//            signInFirebase();
+//        }
     }
 
     //GOOGLE
@@ -104,7 +105,7 @@ public final class utilGoogle {
                 .addOnCompleteListener(task -> {
                         if (task.isSuccessful()){
                             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                            uponLogin();
+                            uponFirebaseLogin();
                         }
                 });
     }
@@ -114,27 +115,47 @@ public final class utilGoogle {
     //FIRESTORE
     private static FirebaseFirestore firestore;
 
-    private static final CollectionReference USER_COLLECTION = firestore.collection("users");
-    private static final CollectionReference ACTIVE_ROOM_COLLECTION = firestore.collection("active_room");
+    //user related in firestore
+    private static CollectionReference USER_COLLECTION;
+    //user structure
+    /** name of document: user email
+     *      field:
+     *      last_login: last time user login
+     *      level: level ( = x matches required to complete x levels)(lv 1 -> 1 game -> lv 2 -> 2 games -> lv 3)
+     *      match_played: match played from first login
+     *      name: name of user (accord to GOOGLE AC)
+     *      reg_date: first time user login
+     */
+
+    private static CollectionReference ACTIVE_ROOM_COLLECTION;
 
     /** add code here if u want to do sth with firestore upon user login*/
-    private static void uponLogin(){
+    private static void uponFirebaseLogin(){
+        //init firestore here
+        firestore = FirebaseFirestore.getInstance();
+        USER_COLLECTION = firestore.collection("users");
+        ACTIVE_ROOM_COLLECTION = firestore.collection("active_room");
+
         //check if new user
         DocumentReference userRef = USER_COLLECTION.document(firebaseUser.getEmail());
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 if (!task.getResult().exists()){
-//                    userRef.set()
+                    //first time login
+//                    userRef.set();
+                } else {
+                    //already a user
                 }
             }
         });
     }
 
-//    private static Map<String,Object> genMapforCurrentFirebaseUser(){
-//        Map<String,Object> userMap = new HashMap<>();
-//        userMap.put("name",firebaseUser.getDisplayName());
-//        userMap.put("update_time", FieldValue.serverTimestamp());
-//    }
+    private static Map<String,Object> genMapforCurrentFirebaseUser(){
+        Map<String,Object> userMap = new HashMap<>();
+        userMap.put("name",firebaseUser.getDisplayName());
+        userMap.put("update_time", FieldValue.serverTimestamp());
+        return userMap;
+    }
 
     public static FirebaseFirestore getFirestore(){return firestore;}
 }

@@ -21,6 +21,8 @@ import com.app.boardgame4521.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -275,4 +277,33 @@ public final class util {
     }
 
     public static NetworkInfo network_getActiveNetworkInfo(){return networkManager.getActiveNetworkInfo();}
+
+    //CALENDAR + TIME
+    public static long getCurrTime_ms() {
+        return System.currentTimeMillis();
+    }
+
+    public static Calendar getCurrTime_calendar() {
+        return new Calendar.Builder().setInstant(new Date(getCurrTime_ms())).build();
+    }
+
+    public static Date getCurrTime_date() {
+        return getCurrTime_calendar().getTime();
+    }
+
+    public static String getCurrTime_string() {
+        return getCurrTime_date().toString();
+    }
+
+    public static Calendar getCalendar(int year, int month, int day, int hour, int minute, int second, int mills) {
+        return new Calendar.Builder().setDate(year, month - 1, day).setTimeOfDay(hour, minute, second, mills).build();
+    }
+
+    public static boolean isTimeAfterNow(Calendar time) {
+        return time.after(getCurrTime_calendar());
+    }
+
+    public static boolean isTimeBeforeNow(Calendar time) {
+        return time.before(getCurrTime_calendar());
+    }
 }
