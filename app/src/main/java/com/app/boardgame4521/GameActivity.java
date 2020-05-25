@@ -60,8 +60,7 @@ public class GameActivity extends AppCompatActivity {
                     if (document != null) {
                         if (document.exists()) {
                             thisPlayer.setCards(Objects.requireNonNull(document.toObject(Player.class)).getCards());
-                            Suit t = (Suit)document.get("trump");
-                            setTrumpImg(t);
+                            setTrumpImg(Suit.valueOf(Objects.requireNonNull(document.get("trump")).toString()));
                             Log.d("GameActivity", "DocumentSnapshot data");
                         } else {
                             Log.d("GameActivity", "No such document");
