@@ -168,6 +168,9 @@ public final class utilGoogle {
 
         //set google stuff ready
         isGoogleReady.set(true);
+
+        //tell user they have logined
+        util.makeToast("Login ed to Google");
     }
 
     private static Map<String,Object> genMapforFirstTimeUser(){
