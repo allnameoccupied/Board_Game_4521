@@ -20,7 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".Room_Selection"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden"/>
         <activity
             android:screenOrientation="landscape"
             android:configChanges="orientation|keyboardHidden"
