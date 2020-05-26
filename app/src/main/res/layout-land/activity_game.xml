@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--    # COMP 4521    #  Chan Hung Yan        20423715          hychanbr@connect.ust.hk-->
+<!--    # COMP 4521    #  Tai Ka Chun          20433540          kctaiab@connect.ust.hk-->
+<!--    # COMP 4521    #  Mong Kin Ip          20433629          kimong@connect.ust.hk-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -157,7 +160,7 @@
             android:layout_weight="1"
             android:onClick="selectCardHandler"
             android:visibility="visible"
-            app:srcCompat="@drawable/card_4c" />
+            app:srcCompat="@drawable/card_4s" />
 
         <ImageView
             android:id="@+id/card3"
