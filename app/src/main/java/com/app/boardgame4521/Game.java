@@ -242,7 +242,7 @@ public class Game {
 
     }
 
-    private Player firstTrial() {
+    public Player firstTrial() {
 
         List<Card> pile = new ArrayList<>();
 
@@ -268,7 +268,7 @@ public class Game {
         return players.get((((round - 1) % 4) + pile.indexOf(winner)) % 4);
     }
 
-    private Player nextTrial(Player lastWinner) {
+    public Player nextTrial(Player lastWinner) {
 
         List<Card> pile = new ArrayList<>();
 
