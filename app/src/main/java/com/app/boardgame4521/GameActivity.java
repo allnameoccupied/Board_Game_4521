@@ -122,6 +122,7 @@ public class GameActivity extends AppCompatActivity {
         });
         if (game.getPlayers().get(myPos).settingTarget) {
             //add target to db
+            Log.d("GameActivity", "setting target = true");
             pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
                     //("target", Integer.parseInt(myTarget.getText().toString()), "settingTarget", false)
                     .addOnCompleteListener(task -> {
