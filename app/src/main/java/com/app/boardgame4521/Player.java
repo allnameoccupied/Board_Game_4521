@@ -13,8 +13,8 @@ public class Player {
     private int score;
     private int target;
     private int stack;
-    public boolean selectingCard = true;
-    public boolean settingTarget;
+    public boolean selectingCard = false;
+    public boolean settingTarget = false;
     private Position position;
     private List<Card> cards = new ArrayList<>();
     private Card playingCard = null;

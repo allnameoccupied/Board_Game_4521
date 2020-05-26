@@ -59,9 +59,8 @@ public class GameActivity extends AppCompatActivity {
         west_card = findViewById(R.id.west_card);
         north_card = findViewById(R.id.north_card);
         initCardImgArray();
-        game.initRound();
+        game.startGame();
         initRoundUI();
-
     }
 
     private void initRoundUI() {
@@ -112,36 +111,39 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void targetConfirmHandler(View view) {
-        if (thisPlayer.settingTarget) {
+        pdb.document(path).get().addOnCompleteListener((task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    game.getPlayers().get(myPos).settingTarget = Boolean.getBoolean(Objects.requireNonNull(document.get("settingTarget")).toString());
+                    Log.d("GameActivity", "onclick");
+                }
+            }
+        });
+        if (game.getPlayers().get(myPos).settingTarget) {
             //add target to db
+            Log.d("GameActivity", "setting target = true");
             pdb.document(path).update("target", Integer.parseInt(myTarget.getText().toString()))
+                    //("target", Integer.parseInt(myTarget.getText().toString()), "settingTarget", false)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            game.getPlayers().get(myPos).settingTarget = false;
                             Log.d("GameActivity", "target added");
-                        } else {
-                            Log.d("GameActivity", "Error when adding target");
                         }
                     });
+            pdb.document(path).update("settingTarget", false);
             lockBid();
             //check if target needed to be changed
             pdb.document(path).get().addOnCompleteListener((task) -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        if (document.exists()) {
-                            if(!document.get("target").toString().equals(myTarget.getText().toString())){ //check if need to change or not
-                                myTarget.setText(document.get("target").toString());
-                            }
-                            Log.d("GameActivity", "DocumentSnapshot data");
-                        } else {
-                            Log.d("GameActivity", "No such document");
+                    if (document != null && document.exists()) {
+                        if (!document.get("target").toString().equals(myTarget.getText().toString())) { //check if need to change or not
+                            myTarget.setText(Objects.requireNonNull(document.get("target")).toString());
                         }
                     }
-                } else {
-                    Log.d("GameActivity", "get failed with ", task.getException());
                 }
             });
-            thisPlayer.settingTarget = false;
         }
     }
 
@@ -163,7 +165,7 @@ public class GameActivity extends AppCompatActivity {
             view.setVisibility(View.GONE);
             setPlayCard(Position.S, c);
             thisPlayer.setPlayingCard(c);
-            if(s == null) game.setStartSuit(c.getSuit());
+            if (s == null) game.setStartSuit(c.getSuit());
             //add playing card to db
             pdb.document(path).update("playingCard", thisPlayer.getPlayingCard())
                     .addOnCompleteListener(task -> {
@@ -181,6 +183,7 @@ public class GameActivity extends AppCompatActivity {
                             Log.d("GameActivity", "Error when setting start suit");
                         }
                     });
+            thisPlayer.selectingCard = false;
         }
     }
 
