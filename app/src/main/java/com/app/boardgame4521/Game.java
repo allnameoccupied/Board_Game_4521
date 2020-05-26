@@ -25,7 +25,7 @@ public class Game {
     private boolean targetIsSet = false;
     private boolean RoundEnd = false;
     private final List<Card> cardPile = new ArrayList<>();
-    private int totalTarget = 0;
+    private int totalTarget = 2;
     Thread[] threads = new Thread[5];
     private List<Card> cardsToCompare = new ArrayList<>();
     int winnerID = 0;

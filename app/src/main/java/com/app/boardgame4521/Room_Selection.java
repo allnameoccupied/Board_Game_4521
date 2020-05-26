@@ -62,7 +62,6 @@ public class Room_Selection extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.room_selection_menu_item1:
                 util.log("add icon pressed");
-                //TODO add open new room
                 break;
             case R.id.room_selection_menu_item2:
                 if (Room_Selection_Frag1.thisFrag!=null){
@@ -129,8 +128,9 @@ public class Room_Selection extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
             recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
-/** set item on click action here, the "room" object is the one clicked*/
-            adapter.setOnItemClickListener((view1, room) -> util.log(room.name));
+            adapter.setOnItemClickListener((view1, room) -> {
+                util.makeToastLog(room.name);
+            });
         }
 
         //custom room class
